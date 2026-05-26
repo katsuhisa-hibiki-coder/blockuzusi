@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 .vs/
 Log.txt
 blockkuzusi.vcxproj.user
 blockkuzusi/x64
 x64/
+=======
+blockkuzusi.vcxproj.user
+.vs/
+>>>>>>> 3cfd0f34dc641f476c1ba942af3db2d6eb67290a

@@ -1,27 +1,9 @@
-﻿#pragma warning(push)
+﻿#define DX_NON_USING_UNICODE_FUNCTION
+
+#pragma warning(push)
 #pragma warning(disable: 4828 4010)
 #include "DxLib.h"
 #pragma warning(pop)
-
-// ===================
-// ブロックの初期設定
-// ===================
-
-//ブロックの数 (行数＊列数)
-#define BLOCK_ROWS 5
-#define BLOCK_COLS 8
-
-//ブロックのサイズ (幅と高さ：ピクセル)
-#define BLOCK_WIDTH 60
-#define BLOCK_HEIGHT 20
-
-//マージン (画面端からブロックまで：ピクセル)
-#define SCREEN_MARGIN_X 40
-#define SCREEN_MARGIN_Y 50
-
-//ギャップ (ブロック同士の隙間)
-#define BLOCK_GAP_X 5
-#define BLOCK_GAP_Y 5
 
 //構造体"Block"
 struct Block {
@@ -29,64 +11,120 @@ struct Block {
     int is_active;  //ブロックの状態(1：表示 0：非表示)
 };
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-    ChangeWindowMode(TRUE);
-    SetGraphMode(640, 480, 32);
-    SetMainWindowText(L"DXLib Project");
+#define WIDTH 13
+#define HEIGHT 15
 
-    if (DxLib_Init() == -1)
-    {
-        return -1;
-    }
-
-    SetDrawScreen(DX_SCREEN_BACK);
-
-    //ブロック配色配列
-    unsigned int block_colors[BLOCK_ROWS] = {
-        GetColor(255, 0, 0),
-        GetColor(255, 255, 0),
-        GetColor(0, 255, 0),
-        GetColor(0, 255, 255),
-        GetColor(0, 0, 255)
+    char board[HEIGHT][WIDTH + 1] = {
+        "             ",
+        " BBBBBBBBBBB ",
+        " GGGGGGGGGGG ",
+        " GGGGGGGGGGG ",
+        "             ",
+        "             ",
+        "             ",
+        "             ",
+        "             ",
+        "             ",
+        "             ",
+        "             ",
+        "      O      ",
+        "             ",
+        "     ===     "
     };
 
-    struct Block blocks[BLOCK_ROWS][BLOCK_COLS];
-
-    //インスタンスの初期化
-    for (int row = 0; row < BLOCK_ROWS; row++) {
-        for (int col = 0; col < BLOCK_COLS; col++) {
-            //初期座標の計算
-            blocks[row][col].x = SCREEN_MARGIN_X + col * (BLOCK_WIDTH + BLOCK_GAP_X);
-            blocks[row][col].y = SCREEN_MARGIN_Y + row * (BLOCK_HEIGHT + BLOCK_GAP_Y);
-
-            //初期状態
-            blocks[row][col].is_active = 1;
-        }
-    }
-
-    while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+    int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
     {
-        ClearDrawScreen();
+        ChangeWindowMode(TRUE);
+        SetGraphMode(640, 480, 32);
+        SetMainWindowText(L"ブロック崩し");
 
-        DrawString(10, 10, L"Hello, DXLib!", GetColor(255, 255, 255));
+        if (DxLib_Init() == -1)
+        {
+            return -1;
+        }
 
-        for (int row = 0; row < BLOCK_ROWS; row++) {
-            for (int col = 0; col < BLOCK_COLS; col++) {
-                if (blocks[row][col].is_active == 1) {
+        SetDrawScreen(DX_SCREEN_BACK);
 
-                    int bx = blocks[row][col].x;
-                    int by = blocks[row][col].y;
-                    int color = block_colors[row];
+        while (ProcessMessage() == 0 &&
+            CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+        {
+            ClearDrawScreen();
 
-                    DrawBox(bx, by, bx + BLOCK_WIDTH, by + BLOCK_HEIGHT, color, TRUE);
+            // マスサイズ
+            int cellSize = 32;
+
+            // 画面中央配置
+            int offsetX = (640 - WIDTH * cellSize) / 2;
+            int offsetY = (480 - HEIGHT * cellSize) / 2;
+
+            // 描画
+            for (int y = 0; y < HEIGHT; y++)
+            {
+                for (int x = 0; x < WIDTH; x++)
+                {
+                    char c = board[y][x];
+
+                    int left = offsetX + x * cellSize;
+                    int top = offsetY + y * cellSize;
+                    int right = left + cellSize - 2;
+                    int bottom = top + cellSize - 2;
+
+                    // 紫ブロック
+                    if (c == 'B')
+                    {
+                        DrawBox(
+                            left,
+                            top,
+                            right,
+                            bottom,
+                            GetColor(255, 0, 255),
+                            TRUE
+                        );
+                    }
+
+                    // 緑ブロック
+                    else if (c == 'G')
+                    {
+                        DrawBox(
+                            left,
+                            top,
+                            right,
+                            bottom,
+                            GetColor(0, 255, 0),
+                            TRUE
+                        );
+                    }
+
+                    // ボール
+                    else if (c == 'O')
+                    {
+                        DrawCircle(
+                            left + cellSize / 2,
+                            top + cellSize / 2,
+                            5,
+                            GetColor(255, 255, 255),
+                            TRUE
+                        );
+                    }
+
+                    // バー
+                    else if (c == '=')
+                    {
+                        DrawBox(
+                            left,
+                            top + 10,
+                            right,
+                            bottom - 10,
+                            GetColor(0, 255, 255),
+                            TRUE
+                        );
+                    }
                 }
             }
+
+            ScreenFlip();
         }
 
-        ScreenFlip();
+        DxLib_End();
+        return 0;
     }
-
-    DxLib_End();
-    return 0;
-}

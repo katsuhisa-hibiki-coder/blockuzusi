@@ -83,7 +83,7 @@
   <PropertyGroup Label="UserMacros" />
 
   <PropertyGroup>
-    <DX_LIB_DIR>C:\DxLib_VC\&#x30D7;&#x30ED;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x306B;&#x8FFD;&#x52A0;&#x3059;&#x3079;&#x304D;&#x30D5;&#x30A1;&#x30A4;&#x30EB;_VC&#x7528;</DX_LIB_DIR>
+    <DX_LIB_DIR>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用</DX_LIB_DIR>
   </PropertyGroup>
 
   <!-- Win32 Debug -->
