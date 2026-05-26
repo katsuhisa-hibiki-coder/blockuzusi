@@ -9,28 +9,28 @@
 #define HEIGHT 15
 
 char board[HEIGHT][WIDTH + 1] = {
-    "############",
-    "#          #",
-    "# ######## #",
-    "# ######## #",
-    "# ######## #",
-    "#          #",
-    "#          #",
-    "#          #",
-    "#          #",
-    "#          #",
-    "#          #",
-    "#          #",
-    "#    O     #",
-    "#    ===   #",
-    "############"
+    "             ",
+    " BBBBBBBBBBB ",
+    " GGGGGGGGGGG ",
+    " GGGGGGGGGGG ",
+    "             ",
+    "             ",
+    "             ",
+    "             ",
+    "             ",
+    "             ",
+    "             ",
+    "             ",
+    "      O      ",
+    "             ",
+    "     ===     "
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     ChangeWindowMode(TRUE);
     SetGraphMode(640, 480, 32);
-    SetMainWindowText(L"DXLib Project");
+    SetMainWindowText(L"ブロック崩し");
 
     if (DxLib_Init() == -1)
     {
@@ -39,30 +39,80 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     SetDrawScreen(DX_SCREEN_BACK);
 
-    while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+    while (ProcessMessage() == 0 &&
+        CheckHitKey(KEY_INPUT_ESCAPE) == 0)
     {
         ClearDrawScreen();
 
-        DrawString(10, 10, L"Hello, DXLib!", GetColor(255, 255, 255));
+        // マスサイズ
+        int cellSize = 32;
 
-        int cellSize = 20;
-        int offsetX = 100;
-        int offsetY = 50;
+        // 画面中央配置
+        int offsetX = (640 - WIDTH * cellSize) / 2;
+        int offsetY = (480 - HEIGHT * cellSize) / 2;
 
+        // 描画
         for (int y = 0; y < HEIGHT; y++)
         {
             for (int x = 0; x < WIDTH; x++)
             {
                 char c = board[y][x];
 
-                wchar_t str[2] = { (wchar_t)c, L'\0' };
+                int left = offsetX + x * cellSize;
+                int top = offsetY + y * cellSize;
+                int right = left + cellSize - 2;
+                int bottom = top + cellSize - 2;
 
-                DrawString(
-                    offsetX + x * cellSize,
-                    offsetY + y * cellSize,
-                    str,
-                    GetColor(255, 255, 255)
-                );
+                // 紫ブロック
+                if (c == 'B')
+                {
+                    DrawBox(
+                        left,
+                        top,
+                        right,
+                        bottom,
+                        GetColor(255, 0, 255),
+                        TRUE
+                    );
+                }
+
+                // 緑ブロック
+                else if (c == 'G')
+                {
+                    DrawBox(
+                        left,
+                        top,
+                        right,
+                        bottom,
+                        GetColor(0, 255, 0),
+                        TRUE
+                    );
+                }
+
+                // ボール
+                else if (c == 'O')
+                {
+                    DrawCircle(
+                        left + cellSize / 2,
+                        top + cellSize / 2,
+                        5,
+                        GetColor(255, 255, 255),
+                        TRUE
+                    );
+                }
+
+                // バー
+                else if (c == '=')
+                {
+                    DrawBox(
+                        left,
+                        top + 10,
+                        right,
+                        bottom - 10,
+                        GetColor(0, 255, 255),
+                        TRUE
+                    );
+                }
             }
         }
 
