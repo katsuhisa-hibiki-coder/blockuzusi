@@ -42,22 +42,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     SetDrawScreen(DX_SCREEN_BACK);
 
+    // パワーアップアイテム
+    float itemX = 0.0f, itemY = 0.0f;
+    bool itemActive = false;
+    int itemTimer = 0;
+
     while (ProcessMessage() == 0 &&
         CheckHitKey(KEY_INPUT_ESCAPE) == 0)
     {
         ClearDrawScreen();
 
         // 左移動
-        if (CheckHitKey(KEY_INPUT_LEFT)&& berX > -3){
+        if (CheckHitKey(KEY_INPUT_LEFT) && berX > -3) {
             berX--;
             WaitTimer(100);
         }
 
         // 右移動
-        if (CheckHitKey(KEY_INPUT_RIGHT)&& berX < WIDTH){
+        if (CheckHitKey(KEY_INPUT_RIGHT) && berX < WIDTH) {
             berX++;
             WaitTimer(100);
         }
+
         // マスサイズ
         int cellSize = 32;
 
@@ -66,6 +72,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         int offsetY = (480 - HEIGHT * cellSize) / 2;
 
         SetDrawScreen(DX_SCREEN_BACK);
+
+        // パワーアップアイテム（Sキーでテスト落下）
+        if (CheckHitKey(KEY_INPUT_S) && !itemActive)
+        {
+            itemActive = true;
+            itemX = (float)(offsetX + 6 * cellSize + cellSize / 2);
+            itemY = (float)offsetY;
+        }
+
+        if (itemActive)
+        {
+            itemY += 3.0f;
+            if (itemY > 480) itemActive = false;
+
+            float barY = (float)(offsetY + berY * cellSize);
+            float barLeft = (float)(offsetX + berX * cellSize);
+            float barRight = (float)(offsetX + (berX + 3) * cellSize);
+
+            // パワーアップアイテム
+            if (itemTimer > 0)
+            {
+                barLeft -= 16.0f;
+                barRight += 16.0f;
+            }
+
+            if (itemY >= barY && itemY <= barY + cellSize && itemX >= barLeft && itemX <= barRight)
+            {
+                itemActive = false;
+                itemTimer = 300;
+            }
+        }
+
+        if (itemTimer > 0)
+        {
+            itemTimer--;
+        }
 
         // 描画
         for (int y = 0; y < HEIGHT; y++)
@@ -82,61 +124,45 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 // 紫ブロック
                 if (c == 'B')
                 {
-                    DrawBox(
-                        left,
-                        top,
-                        right,
-                        bottom,
-                        GetColor(255, 0, 255),
-                        TRUE
-                    );
+                    DrawBox(left, top, right, bottom, GetColor(255, 0, 255), TRUE);
                 }
-
                 // 緑ブロック
                 else if (c == 'G')
                 {
-                    DrawBox(
-                        left,
-                        top,
-                        right,
-                        bottom,
-                        GetColor(0, 255, 0),
-                        TRUE
-                    );
+                    DrawBox(left, top, right, bottom, GetColor(0, 255, 0), TRUE);
                 }
-
                 // ボール
                 else if (c == 'O')
                 {
-                    DrawCircle(
-                        left + cellSize / 2,
-                        top + cellSize / 2,
-                        5,
-                        GetColor(255, 255, 255),
-                        TRUE
-                    );
+                    DrawCircle(left + cellSize / 2, top + cellSize / 2, 5, GetColor(255, 255, 255), TRUE);
                 }
-
-                // バー
-
             }
         }
-        //バー描画
+
+        // バー描画
         for (int i = 0; i < 3; i++) {
             int left = offsetX + (berX + i) * cellSize;
             int top = offsetY + berY * cellSize;
             int right = left + cellSize - 2;
             int bottom = top + cellSize - 2;
 
-            DrawBox(
-                left,
-                top + 10,
-                right,
-                bottom - 10,
-                GetColor(0, 255, 255),
-                TRUE
-            );
+            // パワーアップアイテム
+            int extend = (itemTimer > 0) ? 16 : 0;
+            unsigned int barColor = (itemTimer > 0) ? GetColor(255, 200, 220) : GetColor(0, 255, 255);
+
+            int finalLeft = left - (i == 0 ? extend : 0);
+            int finalRight = right + (i == 2 ? extend : 0);
+
+            DrawBox(finalLeft, top + 10, finalRight, bottom - 10, barColor, TRUE);
         }
+
+        // パワーアップアイテム
+        if (itemActive)
+        {
+            DrawCircle((int)itemX, (int)itemY, 8, GetColor(255, 50, 150), TRUE);
+            DrawCircle((int)itemX, (int)itemY, 6, GetColor(255, 255, 255), TRUE);
+        }
+
         ScreenFlip();
     }
 
