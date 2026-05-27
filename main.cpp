@@ -23,8 +23,11 @@ char board[HEIGHT][WIDTH + 1] = {
     "             ",
     "      O      ",
     "             ",
-    "     ===     "
+    "             "
 };
+
+int berX = 5;
+int berY = 14;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -44,12 +47,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         ClearDrawScreen();
 
+        // 左移動
+        if (CheckHitKey(KEY_INPUT_LEFT)&& berX > -3){
+            berX--;
+            WaitTimer(100);
+        }
+
+        // 右移動
+        if (CheckHitKey(KEY_INPUT_RIGHT)&& berX < WIDTH){
+            berX++;
+            WaitTimer(100);
+        }
         // マスサイズ
         int cellSize = 32;
 
         // 画面中央配置
         int offsetX = (640 - WIDTH * cellSize) / 2;
         int offsetY = (480 - HEIGHT * cellSize) / 2;
+
+        SetDrawScreen(DX_SCREEN_BACK);
 
         // 描画
         for (int y = 0; y < HEIGHT; y++)
@@ -102,20 +118,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 }
 
                 // バー
-                else if (c == '=')
-                {
-                    DrawBox(
-                        left,
-                        top + 10,
-                        right,
-                        bottom - 10,
-                        GetColor(0, 255, 255),
-                        TRUE
-                    );
-                }
+
             }
         }
+        //バー描画
+        for (int i = 0; i < 3; i++) {
+            int left = offsetX + (berX + i) * cellSize;
+            int top = offsetY + berY * cellSize;
+            int right = left + cellSize - 2;
+            int bottom = top + cellSize - 2;
 
+            DrawBox(
+                left,
+                top + 10,
+                right,
+                bottom - 10,
+                GetColor(0, 255, 255),
+                TRUE
+            );
+        }
         ScreenFlip();
     }
 
