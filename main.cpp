@@ -21,13 +21,20 @@ char board[HEIGHT][WIDTH + 1] = {
     "             ",
     "             ",
     "             ",
-    "      O      ",
+    "             ",
     "             ",
     "             "
 };
-
+//バーの初期値
 int berX = 5;
 int berY = 14;
+
+float ballX = 5;
+float ballY = 13;
+
+int ballx = 1;
+int bally = -1;
+bool start = false;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -46,17 +53,49 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         CheckHitKey(KEY_INPUT_ESCAPE) == 0)
     {
         ClearDrawScreen();
+        //ボールの動き
+        if (start == true)
+        {
+            ballX += ballx;
+            ballY += bally;
+            WaitTimer(80);
+
+            if (ballX <= -3 || ballX > WIDTH +1 ) {
+                ballx = -ballx;
+            }
+            if (ballY <= -1) {
+                bally = -bally;
+            }
+            if (ballY > HEIGHT){
+                // ボール位置リセット
+                 ballX = 5;
+                 ballY = 13;
+
+                // 移動方向リセット
+                ballx = 1;
+                bally = -1;
+
+                // 停止状態に戻す
+                start = false;
+            }
+        }
+
+        // 上キーで開始
+        if (CheckHitKey(KEY_INPUT_UP))
+        {
+            start = true;
+        }
 
         // 左移動
         if (CheckHitKey(KEY_INPUT_LEFT)&& berX > -3){
             berX--;
-            WaitTimer(100);
+            WaitTimer(80);
         }
 
         // 右移動
         if (CheckHitKey(KEY_INPUT_RIGHT)&& berX < WIDTH){
             berX++;
-            WaitTimer(100);
+            WaitTimer(80);
         }
         // マスサイズ
         int cellSize = 32;
@@ -65,11 +104,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         int offsetX = (640 - WIDTH * cellSize) / 2;
         int offsetY = (480 - HEIGHT * cellSize) / 2;
 
-        SetDrawScreen(DX_SCREEN_BACK);
-
         // 描画
         for (int y = 0; y < HEIGHT; y++)
-        {
+        {   
             for (int x = 0; x < WIDTH; x++)
             {
                 char c = board[y][x];
@@ -106,19 +143,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                 }
 
                 // ボール
-                else if (c == 'O')
+                DrawCircle(
+                    offsetX + ballX * cellSize + cellSize / 2,
+                    offsetY + ballY * cellSize + cellSize / 2,
+                    5,
+                    GetColor(255, 255, 255),
+                    TRUE
+                );
+
+                // バー当たり判定
+                if ((int)ballY == berY - 1)
                 {
-                    DrawCircle(
-                        left + cellSize / 2,
-                        top + cellSize / 2,
-                        5,
-                        GetColor(255, 255, 255),
-                        TRUE
-                    );
+                    if (ballX >= berX && ballX <= berX + 2)
+                    {
+                        bally = -bally;
+                    }
                 }
+                // ブロック当たり判定
+                int bx = (int)ballX;
+                int by = (int)ballY;
 
-                // バー
+                // 範囲内か確認
+                if (bx >= 0 && bx < WIDTH && by >= 0 && by < HEIGHT) {
+                    // ブロックがあるか
+                    if (board[by][bx] == 'B'|board[by][bx] == 'G'){
+                        // ブロック消す
+                        board[by][bx] = ' ';
 
+                        // 跳ね返る
+                        bally = -bally;
+                    }
+                }
             }
         }
         //バー描画
