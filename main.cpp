@@ -50,6 +50,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     // スコア管理
     int score = 0;
 
+    // ライフ管理
+    int life = 3;
+
+    // キーの1つ前の状態を記憶
+    bool prevKeyA = false;
+    bool prevKeyL = false;
+    bool prevKeyS = false;
+
     while (ProcessMessage() == 0 &&
         CheckHitKey(KEY_INPUT_ESCAPE) == 0)
     {
@@ -68,10 +76,22 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         }
 
         // スコア管理（Aキーでテスト加算）
-        if (CheckHitKey(KEY_INPUT_A)) {
+        bool currentKeyA = CheckHitKey(KEY_INPUT_A);
+        if (currentKeyA && !prevKeyA) {
             score += 10;
-            WaitTimer(100);
         }
+        prevKeyA = currentKeyA;
+
+
+        // ライフ管理（Lキーでテスト減少）
+        bool currentKeyL = CheckHitKey(KEY_INPUT_L);
+        if (currentKeyL && !prevKeyL) {
+            if (life > 0) {
+                life--;
+            }
+        }
+        prevKeyL = currentKeyL;
+
 
         // マスサイズ
         int cellSize = 32;
@@ -83,12 +103,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         SetDrawScreen(DX_SCREEN_BACK);
 
         // パワーアップアイテム（Sキーでテスト落下）
-        if (CheckHitKey(KEY_INPUT_S) && !itemActive)
+        bool currentKeyS = CheckHitKey(KEY_INPUT_S);
+        if (currentKeyS && !prevKeyS && !itemActive)
         {
             itemActive = true;
             itemX = (float)(offsetX + 6 * cellSize + cellSize / 2);
             itemY = (float)offsetY;
         }
+        prevKeyS = currentKeyS;
+
 
         if (itemActive)
         {
@@ -165,7 +188,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
             DrawBox(finalLeft, top + 10, finalRight, bottom - 10, barColor, TRUE);
         }
 
-        // パワーアップアイテム
+        // パワーアップアイテム描画
         if (itemActive)
         {
             DrawCircle((int)itemX, (int)itemY, 8, GetColor(255, 50, 150), TRUE);
@@ -174,6 +197,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
         // スコア管理
         DrawFormatString(20, 20, GetColor(255, 255, 255), L"SCORE: %d", score);
+
+        // ライフ管理
+        DrawFormatString(20, 45, GetColor(255, 255, 255), L"LIFE: %d", life);
 
         ScreenFlip();
     }
