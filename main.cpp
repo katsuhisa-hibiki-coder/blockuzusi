@@ -29,7 +29,7 @@ char board[HEIGHT][WIDTH + 1] = {
 int berX = 5;
 int berY = 14;
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
     ChangeWindowMode(TRUE);
     SetGraphMode(640, 480, 32);
@@ -47,6 +47,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     bool itemActive = false;
     int itemTimer = 0;
 
+    // スコア管理
+    int score = 0;
+
     while (ProcessMessage() == 0 &&
         CheckHitKey(KEY_INPUT_ESCAPE) == 0)
     {
@@ -61,6 +64,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // 右移動
         if (CheckHitKey(KEY_INPUT_RIGHT) && berX < WIDTH) {
             berX++;
+            WaitTimer(100);
+        }
+
+        // スコア管理（Aキーでテスト加算）
+        if (CheckHitKey(KEY_INPUT_A)) {
+            score += 10;
             WaitTimer(100);
         }
 
@@ -162,6 +171,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             DrawCircle((int)itemX, (int)itemY, 8, GetColor(255, 50, 150), TRUE);
             DrawCircle((int)itemX, (int)itemY, 6, GetColor(255, 255, 255), TRUE);
         }
+
+        // スコア管理
+        DrawFormatString(20, 20, GetColor(255, 255, 255), L"SCORE: %d", score);
 
         ScreenFlip();
     }
