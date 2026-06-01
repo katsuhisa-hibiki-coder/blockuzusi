@@ -41,6 +41,7 @@ float ballY = 13;
 int ballx = 1;
 int bally = -1;
 bool start = false;
+bool is_gameover = false;
 
     int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
     {
@@ -59,69 +60,72 @@ bool start = false;
         CheckHitKey(KEY_INPUT_ESCAPE) == 0)
     {
         ClearDrawScreen();
-        //ボールの動き
-        if (start == true)
-        {
-            ballX += ballx;
-            ballY += bally;
-            WaitTimer(80);
+        if (is_gameover == false) {
+            //ボールの動き
+            if (start == true)
+            {
+                ballX += ballx;
+                ballY += bally;
+                WaitTimer(80);
 
-            if (ballX <= -3 || ballX > WIDTH +1 ) {
-                ballx = -ballx;
+                if (ballX <= -3 || ballX > WIDTH + 1) {
+                    ballx = -ballx;
+                }
+                if (ballY <= -1) {
+                    bally = -bally;
+                }
+                if (ballY > HEIGHT) {
+                    // ボール位置リセット
+                    ballX = 5;
+                    ballY = 13;
+
+                    // 移動方向リセット
+                    ballx = 1;
+                    bally = -1;
+
+                    // 停止状態に戻す
+                    start = false;
+                }
             }
-            if (ballY <= -1) {
-                bally = -bally;
+
+            // 上キーで開始
+            if (CheckHitKey(KEY_INPUT_UP))
+            {
+                start = true;
             }
-            if (ballY > HEIGHT){
-                // ボール位置リセット
-                 ballX = 5;
-                 ballY = 13;
 
-                // 移動方向リセット
-                ballx = 1;
-                bally = -1;
+            // 左移動
+            if (CheckHitKey(KEY_INPUT_LEFT) && berX > -3) {
+                berX--;
+                WaitTimer(80);
+            }
 
-                // 停止状態に戻す
-                start = false;
+            // 右移動
+            if (CheckHitKey(KEY_INPUT_RIGHT) && berX < WIDTH) {
+                berX++;
+                WaitTimer(80);
             }
         }
 
-        // 上キーで開始
-        if (CheckHitKey(KEY_INPUT_UP))
-        {
-            start = true;
-        }
-
-        // 左移動
-        if (CheckHitKey(KEY_INPUT_LEFT)&& berX > -3){
-            berX--;
-            WaitTimer(80);
-        }
-
-        // 右移動
-        if (CheckHitKey(KEY_INPUT_RIGHT)&& berX < WIDTH){
-            berX++;
-            WaitTimer(80);
-        }
         // マスサイズ
         int cellSize = 32;
-
+        
         // 画面中央配置
         int offsetX = (640 - WIDTH * cellSize) / 2;
         int offsetY = (480 - HEIGHT * cellSize) / 2;
-
+        
         // 描画
         for (int y = 0; y < HEIGHT; y++)
-        {   
+        {
             for (int x = 0; x < WIDTH; x++)
             {
                 char c = board[y][x];
-
+                
                 int left = offsetX + x * cellSize;
                 int top = offsetY + y * cellSize;
                 int right = left + cellSize - 2;
                 int bottom = top + cellSize - 2;
-
+                
                 // 紫ブロック
                 if (c == 'B')
                 {
@@ -134,70 +138,115 @@ bool start = false;
                         TRUE
                     );
                 }
-
+                
                 // 緑ブロック
                 else if (c == 'G')
                 {
                     DrawBox(
                         left,
                         top,
-                        right,
-                        bottom,
-                        GetColor(0, 255, 0),
+                            right,
+                            bottom,
+                            GetColor(0, 255, 0),
+                            TRUE
+                        );
+                    }
+
+                    // ボール
+                    DrawCircle(
+                        offsetX + ballX * cellSize + cellSize / 2,
+                        offsetY + ballY * cellSize + cellSize / 2,
+                        5,
+                        GetColor(255, 255, 255),
                         TRUE
                     );
-                }
 
-                // ボール
-                DrawCircle(
-                    offsetX + ballX * cellSize + cellSize / 2,
-                    offsetY + ballY * cellSize + cellSize / 2,
-                    5,
-                    GetColor(255, 255, 255),
-                    TRUE
-                );
-
-                // バー当たり判定
-                if ((int)ballY == berY - 1)
-                {
-                    if (ballX >= berX && ballX <= berX + 2)
+                    // バー当たり判定
+                    if ((int)ballY == berY - 1)
                     {
-                        bally = -bally;
+                        if (ballX >= berX && ballX <= berX + 2)
+                        {
+                            bally = -bally;
+                        }
+                    }
+                    // ブロック当たり判定
+                    int bx = (int)ballX;
+                    int by = (int)ballY;
+
+                    // 範囲内か確認
+                    if (bx >= 0 && bx < WIDTH && by >= 0 && by < HEIGHT) {
+                        // ブロックがあるか
+                        if (board[by][bx] == 'B' | board[by][bx] == 'G') {
+                            // ブロック消す
+                            board[by][bx] = ' ';
+
+                            // 跳ね返る
+                            bally = -bally;
+                        }
                     }
                 }
-                // ブロック当たり判定
-                int bx = (int)ballX;
-                int by = (int)ballY;
+            }
+            //バー描画
+            for (int i = 0; i < 3; i++) {
+                int left = offsetX + (berX + i) * cellSize;
+                int top = offsetY + berY * cellSize;
+                int right = left + cellSize - 2;
+                int bottom = top + cellSize - 2;
 
-                // 範囲内か確認
-                if (bx >= 0 && bx < WIDTH && by >= 0 && by < HEIGHT) {
-                    // ブロックがあるか
-                    if (board[by][bx] == 'B'|board[by][bx] == 'G'){
-                        // ブロック消す
-                        board[by][bx] = ' ';
+                DrawBox(
+                    left,
+                    top + 10,
+                    right,
+                    bottom - 10,
+                    GetColor(0, 255, 255),
+                    TRUE
+                );
+            }
 
-                        // 跳ね返る
-                        bally = -bally;
+        // ゲームオーバー画面
+        if (is_gameover == true) {
+            SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+            DrawBox(0, 0, 640, 480, GetColor(0, 0, 0), TRUE);
+            SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+            SetFontSize(64);
+            DrawString(160, 200, L"GAMEOVER", GetColor(255, 0, 0));
+            SetFontSize(16);
+
+            // リトライ処理（Rキーでリトライ）
+            if (CheckHitKey(KEY_INPUT_R)) {
+
+                is_gameover = false;
+                start = false;
+                berX = 5;
+
+                ballX = 5;
+                ballY = 13;
+                ballx = 1;
+                bally = -1;
+
+                for (int y = 0; y < HEIGHT; y++) {
+                    for (int x = 0; x < WIDTH; x++) {
+                        if (y == 1 && x >= 1 && x <= 11) {
+                            board[y][x] = 'B';
+                        }
+                        else if ((y == 2 || y == 3) && x >= 1 && x <= 11) {
+                            board[y][x] = 'G';
+                        }
+                        else {
+                            board[y][x] = ' ';
+                        }
                     }
                 }
             }
         }
-        //バー描画
-        for (int i = 0; i < 3; i++) {
-            int left = offsetX + (berX + i) * cellSize;
-            int top = offsetY + berY * cellSize;
-            int right = left + cellSize - 2;
-            int bottom = top + cellSize - 2;
 
-            DrawBox(
-                left,
-                top + 10,
-                right,
-                bottom - 10,
-                GetColor(0, 255, 255),
-                TRUE
-            );
+        // ゲームオーバー処理テスト（Gキーで開始）
+        if (CheckHitKey(KEY_INPUT_G))
+        {
+            is_gameover = true;
         }
+
         ScreenFlip();
     }
 
