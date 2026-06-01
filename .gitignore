@@ -7,4 +7,25 @@ x64/
 =======
 blockkuzusi.vcxproj.user
 .vs/
+<<<<<<< HEAD
 >>>>>>> 3cfd0f34dc641f476c1ba942af3db2d6eb67290a
+=======
+Log.txt
+blockkuzusi/x64/Debug/blockkuzusi.exe.recipe
+blockkuzusi/x64/Debug/blockkuzusi.ilk
+blockkuzusi/x64/Debug/blockkuzusi.log
+blockkuzusi/x64/Debug/main.obj
+blockkuzusi/x64/Debug/vc143.idb
+blockkuzusi/x64/Debug/vc143.pdb
+blockkuzusi/x64/Debug/blockkuzusi.tlog/blockkuzusi.lastbuildstate
+blockkuzusi/x64/Debug/blockkuzusi.tlog/CL.command.1.tlog
+blockkuzusi/x64/Debug/blockkuzusi.tlog/Cl.items.tlog
+blockkuzusi/x64/Debug/blockkuzusi.tlog/CL.read.1.tlog
+blockkuzusi/x64/Debug/blockkuzusi.tlog/CL.write.1.tlog
+blockkuzusi/x64/Debug/blockkuzusi.tlog/link.command.1.tlog
+blockkuzusi/x64/Debug/blockkuzusi.tlog/link.read.1.tlog
+blockkuzusi/x64/Debug/blockkuzusi.tlog/link.secondary.1.tlog
+blockkuzusi/x64/Debug/blockkuzusi.tlog/link.write.1.tlog
+x64/Debug/blockkuzusi.exe
+x64/Debug/blockkuzusi.pdb
+>>>>>>> origin/katuhisa
