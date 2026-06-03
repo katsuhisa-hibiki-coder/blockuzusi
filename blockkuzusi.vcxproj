@@ -172,6 +172,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include=".github\workflows\slack-notify.yml" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>
