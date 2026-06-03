@@ -1,5 +1,15 @@
+<<<<<<< HEAD
+.vs/
+Log.txt
+blockkuzusi.vcxproj.user
+blockkuzusi/x64
+x64/
+=======
 blockkuzusi.vcxproj.user
 .vs/
+<<<<<<< HEAD
+>>>>>>> 3cfd0f34dc641f476c1ba942af3db2d6eb67290a
+=======
 Log.txt
 blockkuzusi/x64/Debug/blockkuzusi.exe.recipe
 blockkuzusi/x64/Debug/blockkuzusi.ilk
@@ -18,3 +28,4 @@ blockkuzusi/x64/Debug/blockkuzusi.tlog/link.secondary.1.tlog
 blockkuzusi/x64/Debug/blockkuzusi.tlog/link.write.1.tlog
 x64/Debug/blockkuzusi.exe
 x64/Debug/blockkuzusi.pdb
+>>>>>>> origin/katuhisa
