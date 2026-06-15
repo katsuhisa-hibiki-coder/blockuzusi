@@ -4,7 +4,7 @@
 #pragma warning(disable: 4828 4010)
 #include "DxLib.h"
 #pragma warning(pop)
-
+#include <math.h>
 struct Block {
     int x, y;
     int is_active;
@@ -249,8 +249,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         if (ballX + BALL_R > barLeft && ballX - BALL_R < barRight && ballY + BALL_R > barTop && ballY - BALL_R < barBot && vy > 0)
         {
-            vy = -vy;
             ballY = barTop - BALL_R;
+            // バーの中心
+            float barCenter = (barLeft + barRight) / 2.0f;
+            // 中心からのずれ
+            float dx = ballX - barCenter;
+            // 角度を計算
+            float angle = atan2(-80.0f, dx);
+            // ボール速度
+            float speed = 5.0f;
+            vx = speed * cos(angle);
+            vy = speed * sin(angle);
         }
 
         //  ブロックとの衝突
